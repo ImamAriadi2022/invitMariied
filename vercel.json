@@ -1,11 +1,11 @@
 {
     "version": 2,
-    "public": "./",
+    "public": "true",
     "builds": [],
     "routes": [
       {
-        "src": "/(.*)",
-        "dest": "/index.html"
+        "src": "/baru/(.*)",
+        "dest": "/baru/index.html"
       }
     ]
   }
