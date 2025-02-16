@@ -3,7 +3,7 @@ import { bs } from '../../libs/bootstrap.js';
 import { dto } from '../../connection/dto.js';
 import { storage } from '../../common/storage.js';
 import { session } from '../../common/session.js';
-import { request, HTTP_GET, HTTP_STATUS_OK } from '../../connection/request.js';
+// import { request, HTTP_GET, HTTP_STATUS_OK } from '../../connection/request.js';
 
 export const auth = (() => {
 
@@ -29,11 +29,16 @@ export const auth = (() => {
         formEmail.disabled = true;
         formPassword.disabled = true;
 
-        const res = await session.login(dto.postSessionRequest(formEmail.value, formPassword.value));
-        if (res) {
+        // Simulate successful login
+        const res = { success: true };
+        if (res.success) {
             formEmail.value = null;
             formPassword.value = null;
             bs.modal('mainModal').hide();
+
+            // Set static user data
+            user.set('email', 'imamariadi775@gmail.com');
+            user.set('name', 'Imam Ariadi');
         }
 
         btn.restore();
@@ -54,17 +59,17 @@ export const auth = (() => {
      * @returns {Promise<ReturnType<typeof dto.baseResponse>>}
      */
     const getDetailUser = () => {
-        return request(HTTP_GET, '/api/user').token(session.getToken()).send().then((res) => {
-            if (res.code !== HTTP_STATUS_OK) {
-                throw new Error('failed to get user.');
-            }
-
+        // Return static user data
+        return new Promise((resolve) => {
+            const res = {
+                code: 200,
+                data: {
+                    email: 'imamariadi775@gmail.com',
+                    name: 'Imam Ariadi'
+                }
+            };
             Object.entries(res.data).forEach(([k, v]) => user.set(k, v));
-
-            return res;
-        }, (res) => {
-            clearSession();
-            return res;
+            resolve(res);
         });
     };
 

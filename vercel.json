@@ -7,7 +7,7 @@
     },
     {
       "src": "output/js/app/admin/auth.js",
-      "use": "@vercel/node"
+      "use": "@vercel/static"
     },
     {
       "src": "output/js/app/admin/*.js",
