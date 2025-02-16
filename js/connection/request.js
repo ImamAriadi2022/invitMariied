@@ -14,6 +14,7 @@ export const request = (method, path) => {
 
     const ac = new AbortController();
 
+    let url = document.body.getAttribute('data-url');
     let req = {
         signal: ac.signal,
         method: String(method).toUpperCase(),
@@ -27,6 +28,10 @@ export const request = (method, path) => {
     window.addEventListener('popstate', () => ac.abort());
     window.addEventListener('beforeunload', () => ac.abort());
 
+    if (url.slice(-1) === '/') {
+        url = url.slice(0, -1);
+    }
+
     return {
         /**
          * @template T
@@ -34,45 +39,76 @@ export const request = (method, path) => {
          * @returns {Promise<ReturnType<typeof dto.baseResponse<T>>>}
          */
         send(transform = null) {
-            // Simulate a static response
-            return new Promise((resolve) => {
-                const res = {
-                    code: HTTP_STATUS_OK,
-                    data: {
-                        message: 'Static response data'
-                    },
-                    error: null
-                };
+            return fetch(url + path, req)
+                .then((res) => {
+                    return res.json().then((json) => {
+                        if (res.status >= HTTP_STATUS_INTERNAL_SERVER_ERROR && (json.message ?? json[0])) {
+                            throw new Error(json.message ?? json[0]);
+                        }
 
-                if (transform) {
-                    res.data = transform(res.data);
-                }
+                        if (json.error) {
+                            throw new Error(json.error[0]);
+                        }
 
-                resolve(dto.baseResponse(res.code, res.data, res.error));
-            });
+                        if (transform) {
+                            json.data = transform(json.data);
+                        }
+
+                        return dto.baseResponse(json.code, json.data, json.error);
+                    });
+                })
+                .catch((err) => {
+                    if (err.name === 'AbortError') {
+                        console.warn('Fetch abort:', err);
+                        return err;
+                    }
+
+                    alert(err);
+                    throw new Error(err);
+                });
         },
         /**
          * @returns {Promise<boolean>}
          */
         download() {
-            // Simulate a static download response
-            return new Promise((resolve) => {
-                const filename = 'static_download.csv';
-                const blob = new Blob(['Static,CSV,Content'], { type: 'text/csv' });
-                const link = document.createElement('a');
-                const href = window.URL.createObjectURL(blob);
+            return fetch(url + path, req)
+                .then((res) => {
+                    if (res.status !== HTTP_STATUS_OK) {
+                        return false;
+                    }
 
-                link.href = href;
-                link.download = filename;
-                document.body.appendChild(link);
+                    const existingLink = document.querySelector('a[download]');
+                    if (existingLink) {
+                        document.body.removeChild(existingLink);
+                    }
 
-                link.click();
+                    const filename = res.headers.get('content-disposition')?.match(/filename="(.+)"/)?.[1] ?? 'download.csv';
 
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(href);
+                    return res.blob().then((blob) => {
+                        const link = document.createElement('a');
+                        const href = window.URL.createObjectURL(blob);
 
-                resolve(true);
-            });
+                        link.href = href;
+                        link.download = filename;
+                        document.body.appendChild(link);
+
+                        link.click();
+
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(href);
+
+                        return true;
+                    });
+                })
+                .catch((err) => {
+                    if (err.name === 'AbortError') {
+                        console.warn('Fetch abort:', err);
+                        return err;
+                    }
+
+                    alert(err);
+                    throw new Error(err);
+                });
         },
         /**
          * @param {string} token
