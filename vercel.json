@@ -2,22 +2,26 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.html",
+      "src": "output/index.html",
       "use": "@vercel/static"
     },
     {
-      "src": "js/app/admin/auth.js",
+      "src": "output/js/app/admin/auth.js",
       "use": "@vercel/node"
     },
     {
-      "src": "js/app/admin/*.js",
+      "src": "output/js/app/admin/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "output/js/*.js",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/output/index.html"
     }
   ]
 }
