@@ -21,16 +21,11 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/output/index.html"
     }
   ],
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    },
-    "commands": [
-      "npm install",
-      "npm run dev"
-    ]
-  }
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "buildCommand": "npm install && npm run dev"
 }
