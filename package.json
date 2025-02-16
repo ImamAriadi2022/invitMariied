@@ -11,8 +11,7 @@
         "lint:js": "eslint js",
         "lint:css": "stylelint css",
         "lint:html": "htmlhint **/*.html",
-        "dev": "npx esbuild js/*.js --bundle --outdir=dist --servedir=.",
-        "build": "npx esbuild js/*.js --bundle --minify --outdir=public"
+        "dev": "vercel dev"
     },
     "dependencies": {
         "esbuild": "^0.24.2"
