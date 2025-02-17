@@ -1,6 +1,7 @@
 {
     "devDependencies": {
         "@eslint/js": "^9.19.0",
+        "esbuild": "^0.25.0",
         "eslint": "^9.19.0",
         "globals": "^15.14.0",
         "htmlhint": "^1.1.4",
@@ -12,9 +13,6 @@
         "lint:css": "stylelint css",
         "lint:html": "htmlhint **/*.html",
         "dev": "npx esbuild js/*.js --bundle --outdir=dist --servedir=.",
-        "build": "npx esbuild js/*.js --bundle --minify --outdir=dist"
-    },
-    "dependencies": {
-        "esbuild": "^0.24.2"
+        "build": "npx esbuild js/guest.js js/admin.js --bundle --minify --outdir=dist"
     }
 }
